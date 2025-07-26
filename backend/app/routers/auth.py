@@ -1,30 +1,30 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException
 from app.models.user import UserCreate, UserOut
+from app.core.db import auth as firebase_auth, db
 
 router = APIRouter()
 
-# Simplified in-memory user "database"
-fake_users_db = {}
-
 @router.post("/register", response_model=UserOut)
 async def register_user(user: UserCreate):
-    if user.email in fake_users_db:
-        raise HTTPException(status_code=400, detail="User already exists")
-    # Simulate password hashing: store plain password (in real app, hash it)
-    user_dict = user.dict()
-    user_id = f"user_{len(fake_users_db) + 1}"
-    fake_users_db[user.email] = {"id": user_id, **user_dict}
-    return UserOut(id=user_id, **user.dict(exclude={"password"}))
-
-@router.post("/login")
-async def login(form_data: dict):
-    # Simulate login, accept JSON body: { "username": "...", "password": "..." }
-    username = form_data.get("username")
-    password = form_data.get("password")
-    if not username or not password:
-        raise HTTPException(status_code=400, detail="Username and password required")
-    user = fake_users_db.get(username)
-    if user is None or user["password"] != password:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
-    # Return a dummy token
-    return {"access_token": "fake-jwt-token", "token_type": "bearer"}
+    # 1. Create user in Firebase Auth
+    try:
+        fb_user = firebase_auth.create_user(
+            email=user.email,
+            password=user.password,
+            display_name=user.name
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    # 2. Add extra profile info to Firestore
+    user_doc = {
+        "email": user.email,
+        "user_type": user.user_type,
+        "name": user.name,
+        "dob": user.dob,
+        "gender": user.gender,
+        "height": user.height,
+        "weight": user.weight
+    }
+    db.collection("users").document(fb_user.uid).set(user_doc)
+    return UserOut(id=fb_user.uid, **user_doc)
