@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PulsePro Demo Frontend</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Firebase Compat SDK -->
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>PulsePro Activity Tracker</h1>
+
+    <!-- Registration Section -->
+    <div id="register-section">
+      <h2>Register</h2>
+      <input type="email" id="reg-email" placeholder="Email" required />
+      <input type="password" id="reg-password" placeholder="Password" required />
+      <input type="text" id="reg-name" placeholder="Name (optional)" />
+      <button id="register-btn">Register</button>
+      <p id="register-message" class="message"></p>
+    </div>
+
+    <!-- Login Section -->
+    <div id="login-section">
+      <h2>Login</h2>
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button id="login-btn">Login</button>
+      <p id="login-message" class="message"></p>
+    </div>
+
+    <!-- Activity Section (hidden initially) -->
+    <div id="activity-section" style="display:none;">
+      <h2>Create Activity</h2>
+      <input type="text" id="activity-type" placeholder="Type (e.g., running)" />
+      <input type="number" id="activity-duration" placeholder="Duration (minutes)" />
+      <button id="add-activity-btn">Add Activity</button>
+      <p id="activity-message" class="message"></p>
+
+      <h3>Your Activities</h3>
+      <ul id="activity-list"></ul>
+
+      <button id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
