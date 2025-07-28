@@ -3,48 +3,229 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PulsePro Demo Frontend</title>
+  <title>PulsePro Dashboard</title>
+
   <link rel="stylesheet" href="styles.css" />
-  <!-- Firebase Compat SDK -->
-  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.0.0/firebase-auth-compat.js"></script>
+
+  <!-- Firebase SDK (compat for simple integration) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+  <!-- Chart.js for Data Visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <h1>PulsePro Activity Tracker</h1>
+  <div class="container" role="main" aria-live="polite">
 
-    <!-- Registration Section -->
-    <div id="register-section">
-      <h2>Register</h2>
-      <input type="email" id="reg-email" placeholder="Email" required />
-      <input type="password" id="reg-password" placeholder="Password" required />
-      <input type="text" id="reg-name" placeholder="Name (optional)" />
-      <button id="register-btn">Register</button>
-      <p id="register-message" class="message"></p>
-    </div>
+    <header>
+      <h1>PulsePro - Smart Wellness & Activity</h1>
+      <div id="user-info" class="hidden">
+        <span id="user-display-name"></span>
+        <button id="btn-logout" aria-label="Logout">Logout</button>
+      </div>
+    </header>
 
-    <!-- Login Section -->
-    <div id="login-section">
-      <h2>Login</h2>
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <button id="login-btn">Login</button>
-      <p id="login-message" class="message"></p>
-    </div>
+    <!-- Authentication -->
+    <section id="auth-section">
+      <div id="register-panel" class="auth-panel">
+        <h2>Register</h2>
+        <input type="email" id="reg-email" placeholder="Email" aria-label="Registration Email" />
+        <input type="password" id="reg-password" placeholder="Password" aria-label="Registration Password" />
+        <input type="text" id="reg-name" placeholder="Full Name" aria-label="Full Name (optional)" />
+        <button id="btn-register">Register</button>
+        <p class="message" id="reg-message" role="alert"></p>
+        <p>Already have an account? <button id="show-login" class="link-btn">Login</button></p>
+      </div>
 
-    <!-- Activity Section (hidden initially) -->
-    <div id="activity-section" style="display:none;">
-      <h2>Create Activity</h2>
-      <input type="text" id="activity-type" placeholder="Type (e.g., running)" />
-      <input type="number" id="activity-duration" placeholder="Duration (minutes)" />
-      <button id="add-activity-btn">Add Activity</button>
-      <p id="activity-message" class="message"></p>
+      <div id="login-panel" class="auth-panel hidden">
+        <h2>Login</h2>
+        <input type="email" id="login-email" placeholder="Email" aria-label="Login Email" />
+        <input type="password" id="login-password" placeholder="Password" aria-label="Login Password" />
+        <button id="btn-login">Login</button>
+        <p class="message" id="login-message" role="alert"></p>
+        <p>Don't have an account? <button id="show-register" class="link-btn">Register</button></p>
+      </div>
+    </section>
 
-      <h3>Your Activities</h3>
-      <ul id="activity-list"></ul>
+    <!-- Onboarding: Choose Persona -->
+    <section id="onboard-section" class="hidden">
+      <h2>Welcome! Choose Your Role</h2>
+      <button id="choose-athlete" class="persona-btn">Athlete</button>
+      <button id="choose-elder" class="persona-btn">Elder</button>
+    </section>
 
-      <button id="logout-btn">Logout</button>
-    </div>
+    <!-- Profile Completion -->
+    <section id="profile-section" class="hidden">
+      <h2>Complete Your Profile</h2>
+      <form id="profile-form" novalidate>
+        <label>
+          Full Name
+          <input type="text" id="profile-name" required aria-required="true" />
+        </label>
+
+        <label>
+          Date of Birth
+          <input type="date" id="profile-dob" required aria-required="true" />
+        </label>
+
+        <label>
+          Gender
+          <select id="profile-gender" required aria-required="true">
+            <option value="">Select Gender</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+
+        <label>
+          Height (cm)
+          <input type="number" id="profile-height" min="50" max="250" required />
+        </label>
+
+        <label>
+          Weight (kg)
+          <input type="number" id="profile-weight" min="20" max="300" required />
+        </label>
+
+        <div id="athlete-extra" class="hidden">
+          <label>
+            Sport
+            <input type="text" id="profile-sport" />
+          </label>
+        </div>
+
+        <div id="elder-extra" class="hidden">
+          <label>
+            Medical Conditions
+            <textarea id="profile-conditions" rows="3" placeholder="Optional details"></textarea>
+          </label>
+        </div>
+
+        <button type="submit" id="btn-profile-submit">Save Profile</button>
+        <p class="message" id="profile-message" role="alert"></p>
+      </form>
+    </section>
+
+    <!-- Main Dashboard -->
+    <main id="dashboard-section" class="hidden">
+
+      <h2 id="dashboard-welcome"></h2>
+
+      <!-- Activity and Wellness Manual Input -->
+      <section aria-labelledby="activity-wellness-title">
+        <h3 id="activity-wellness-title">Log Activity & Wellness</h3>
+
+        <div class="input-group">
+          <label for="input-activity-type">Activity Type</label>
+          <input id="input-activity-type" type="text" placeholder="e.g. running" />
+        </div>
+        <div class="input-group">
+          <label for="input-activity-duration">Duration (minutes)</label>
+          <input id="input-activity-duration" type="number" min="1" />
+        </div>
+        <button id="btn-submit-activity">Add Activity</button>
+        <p id="activity-message" class="message"></p>
+
+        <div class="input-group">
+          <label for="input-wellness-type">Wellness Log Type</label>
+          <select id="input-wellness-type">
+            <option value="fatigue">Fatigue</option>
+            <option value="pain">Pain</option>
+            <option value="sleep">Sleep</option>
+            <option value="mood">Mood</option>
+            <option value="stress">Stress</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label for="input-wellness-level">Level (1-10)</label>
+          <input id="input-wellness-level" type="number" min="1" max="10" />
+        </div>
+        <div class="input-group">
+          <label for="input-wellness-notes">Description / Notes</label>
+          <textarea id="input-wellness-notes" rows="2" placeholder="Optional"></textarea>
+        </div>
+        <button id="btn-submit-wellness">Add Wellness Log</button>
+        <p id="wellness-message" class="message"></p>
+      </section>
+
+      <!-- Wearable Sync Panel (UI mock) -->
+      <section id="wearable-sync-section" class="wearable-sync">
+        <h3>Wearable Sync</h3>
+        <p>Connect your wearable for automatic data sync:</p>
+        <button id="btn-sync-healthkit" disabled>Sync Apple HealthKit</button>
+        <button id="btn-sync-googlefit" disabled>Sync Google Fit</button>
+        <button id="btn-sync-fitbit" disabled>Sync Fitbit</button>
+        <p class="note">* Wearable sync currently available in mobile app only.</p>
+      </section>
+
+      <!-- AI Risk Prediction -->
+      <section id="ai-risk-section">
+        <h3>AI Risk Prediction</h3>
+        <p>Check your personalized risk and recommendations.</p>
+
+        <div id="ai-role-selector">
+          <button id="btn-ai-athlete">Athlete</button>
+          <button id="btn-ai-elder">Elder</button>
+        </div>
+
+        <form id="ai-athlete-form" class="ai-form hidden" novalidate>
+          <label>Fatigue (0-10)
+            <input type="number" id="ai-fatigue" min="0" max="10" required/>
+          </label>
+          <label>Soreness (0-10)
+            <input type="number" id="ai-soreness" min="0" max="10" required/>
+          </label>
+          <label>Sleep hours
+            <input type="number" id="ai-sleep" min="0" max="24" step="0.1" required/>
+          </label>
+          <label>Stress (0-10)
+            <input type="number" id="ai-stress" min="0" max="10" required/>
+          </label>
+          <button type="submit">Check Athlete Risk</button>
+        </form>
+
+        <form id="ai-elder-form" class="ai-form hidden" novalidate>
+          <label>Pain (0-10)
+            <input type="number" id="ai-pain" min="0" max="10" required/>
+          </label>
+          <label>Fatigue (0-10)
+            <input type="number" id="ai-elder-fatigue" min="0" max="10" required/>
+          </label>
+          <label>Steps today
+            <input type="number" id="ai-steps" min="0" max="100000" step="1" required/>
+          </label>
+          <button type="submit">Check Elder Risk</button>
+        </form>
+
+        <div id="ai-risk-result" aria-live="polite" class="ai-result"></div>
+      </section>
+
+      <!-- Dashboard Visualization (placeholders) -->
+      <section id="visualization-section">
+        <h3>Your Activity & Wellness Trends</h3>
+        <canvas id="chart-activity" aria-label="Activity trend chart" role="img"></canvas>
+        <canvas id="chart-wellness" aria-label="Wellness trend chart" role="img"></canvas>
+      </section>
+
+      <!-- Voice Notes Section -->
+      <section id="voice-section">
+        <h3>Record Voice Notes</h3>
+        <button id="btn-start-recording">Start Recording</button>
+        <button id="btn-stop-recording" disabled>Stop Recording</button>
+        <p id="voice-status"></p>
+        <textarea id="voice-transcript" rows="4" readonly placeholder="Transcribed text will appear here..."></textarea>
+        <button id="btn-submit-voice" disabled>Submit Voice Note</button>
+        <p id="voice-message" class="message"></p>
+      </section>
+
+    </main>
+
+    <!-- Support Dashboard Stub -->
+    <section id="support-section" class="hidden">
+      <h2>Support Dashboard (Coach / Caregiver / Family)</h2>
+      <p>Feature coming soon. Will display linked users, risk alerts, etc.</p>
+    </section>
   </div>
 
   <script src="script.js"></script>
