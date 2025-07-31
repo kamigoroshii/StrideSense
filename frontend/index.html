@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>PulsePro Dashboard</title>
 
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="./styles.css" />
 
   <!-- Firebase SDK (compat for simple integration) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -183,6 +183,9 @@
             <input type="number" id="ai-stress" min="0" max="10" required/>
           </label>
           <button type="submit">Check Athlete Risk</button>
+
+          <button id="btn-ai-autofill" type="button">Auto-fill from Wearable</button>
+          <button id="btn-ai-voice-fill" type="button">🎤 Voice Input</button>
         </form>
 
         <form id="ai-elder-form" class="ai-form hidden" novalidate>
@@ -196,16 +199,33 @@
             <input type="number" id="ai-steps" min="0" max="100000" step="1" required/>
           </label>
           <button type="submit">Check Elder Risk</button>
+          <button id="btn-ai-voice-fill-elder" type="button">🎤 Voice Input</button>
         </form>
 
         <div id="ai-risk-result" aria-live="polite" class="ai-result"></div>
       </section>
+
+      <!-- Risk Prediction History -->
+      <section id="risk-history-section">
+        <h3>Risk Prediction History</h3>
+        <table id="risk-history-table">
+          <thead>
+            <tr><th>Date</th><th>Risk</th><th>Factors</th><th>Recommendation</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+
+      <canvas id="ai-hr-chart"></canvas>
+      <canvas id="ai-fatigue-chart"></canvas>
+      
 
       <!-- Dashboard Visualization (placeholders) -->
       <section id="visualization-section">
         <h3>Your Activity & Wellness Trends</h3>
         <canvas id="chart-activity" aria-label="Activity trend chart" role="img"></canvas>
         <canvas id="chart-wellness" aria-label="Wellness trend chart" role="img"></canvas>
+        <button id="btn-download-csv">Download CSV</button>
       </section>
 
       <!-- Voice Notes Section -->
@@ -228,6 +248,6 @@
     </section>
   </div>
 
-  <script src="script.js"></script>
+  <script src="./script.js"></script>
 </body>
 </html>

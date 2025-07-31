@@ -1,2 +1,0 @@
-Requirement already satisfied: pydantic in d:\raphel\stridesense\venv\lib\site-packages (1.10.11)
-Requirement already satisfied: typing-extensions>=4.2.0 in d:\raphel\stridesense\venv\lib\site-packages (from pydantic) (4.14.1)
