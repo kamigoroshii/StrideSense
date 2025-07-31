@@ -781,7 +781,7 @@ async function renderRiskHistory() {
     return;
   }
   try {
-    const resp = await fetch(`${API_BASE_URL}/risk_predictions?user_id=${currentUser.uid}`, {
+    const resp = await fetch(`${API_BASE_URL}/ai/risk_predictions?user_id=${currentUser.uid}`, {
       headers: { Authorization: `Bearer ${currentUserToken}` }
     });
     if (!resp.ok) {
