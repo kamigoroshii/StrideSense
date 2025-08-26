@@ -1,8 +1,10 @@
 
 
-# StrideSense - AI-Powered Sports Injury Risk Prediction
+# StrideSense - Sacropenia and Sports Injury Risk Prediction
 
-A comprehensive system for predicting sports injury risks using AI and real-time biometric data.
+
+By performing wearable integration taking the past data and performing ML prediction for athletes regarding 
+bone degradation diseases and muscle mass like sacropenia for both elders and young athletes
 
 ## Project Structure
 
@@ -96,4 +98,5 @@ jupyter notebook athlete_injury_model.ipynb
 - **Frontend**: HTML5, CSS3, JavaScript
 - **AI/ML**: scikit-learn, pandas, numpy
 - **Data Storage**: CSV files, Firebase (optional)
+
 - **Development**: Jupyter Notebooks
